@@ -70,6 +70,11 @@ contract Recur {
         _;
     }
 
+    modifier isValidUser(){
+        require(!isBlacklisted(msg.sender), "You have been banned");
+        _;
+    }
+
 
     /// @notice amount is multiplied by one ether as amount is expected to not follow the 18 decimals convention for CUSD
     function addYourAnimal(
@@ -77,7 +82,7 @@ contract Recur {
         string memory _image,
         string memory _description,
         uint256 amount
-    ) public {
+    ) public isValidUser() {
         require(bytes(_name).length > 0, "Empty name");
         require(bytes(_image).length > 0, "Empty image url");
         require(bytes(_description).length > 0, "Empty description");
@@ -108,6 +113,7 @@ contract Recur {
     function getAnimals(uint256 _index)
         public
         view
+        isValidUser()
         exists(_index)
         returns (
             address payable,
@@ -129,7 +135,7 @@ contract Recur {
         );
     }
 
-    function adoptAnimal(uint256 _index) external payable exists(_index) {
+    function adoptAnimal(uint256 _index) external payable isValidUser() exists(_index) {
         require(!animals[_index].adopted, "Animal is already adopted");
         require(animals[_index].owner != msg.sender, "Invalid customer");
         require(
@@ -144,7 +150,7 @@ contract Recur {
     }
 
     /// @dev puts an animal back on the marketpalce
-    function releaseAnimal(uint256 _index) external payable exists(_index) isOwner(_index) {
+    function releaseAnimal(uint256 _index) external payable isValidUser() exists(_index) isOwner(_index) {
         require(animals[_index].adopted, "Animal isn't adopted");
         require(
             IERC20Token(cUsdTokenAddress).transferFrom(
@@ -158,7 +164,7 @@ contract Recur {
     }
 
     /// @dev removes an animal from the platform, callable by admin or the animal's owner
-    function removeAnimal(uint _index) external exists(_index) {
+    function removeAnimal(uint _index) external isValidUser() exists(_index) {
         exist[_index] = false;
         animals[_index] = animals[animalLength - 1];
         delete animals[animalLength - 1];
@@ -178,7 +184,7 @@ contract Recur {
     }
 
     /// @dev finds all the animals available
-    function getAllAnimals() public view returns (Animal[] memory){
+    function getAllAnimals() public view isValidUser() returns (Animal[] memory){
         Animal[] memory allAnimals = new Animal[](animalLength);
         uint index = 0;
         while(index < animalLength){
@@ -190,7 +196,7 @@ contract Recur {
 
 
 
-    function getAnimalLength() public view returns (uint256) {
+    function getAnimalLength() public view isValidUser() returns (uint256) {
         return animalLength;
     }
 }
