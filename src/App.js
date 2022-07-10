@@ -86,7 +86,6 @@ function App() {
     }
   };
 
-
   const formSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -112,22 +111,21 @@ function App() {
   const adoptAnimal = async (index) => {
     try {
       const cUSDContract = new kit.web3.eth.Contract(ierc, cUSDContractAddress);
-      const amount = new BigNumber(animals[index].amount).shiftedBy(ERC20_DECIMALS).toString();
+      const amount = new BigNumber(animals[index].amount)
+        .shiftedBy(ERC20_DECIMALS)
+        .toString();
       await cUSDContract.methods
         .approve(contractAddress, amount)
         .send({ from: address });
-      const tx = await contract.methods
-        .adoptAnimal(index)
-        .send({
-          from: address,
-        });
+      const tx = await contract.methods.adoptAnimal(index).send({
+        from: address,
+      });
       getBalance();
-      getAnimals()
+      getAnimals();
     } catch (error) {
       console.log(error);
     }
-
-  }
+  };
 
   const releaseAnimal = async (index) => {
     try {
@@ -136,17 +134,15 @@ function App() {
       await cUSDContract.methods
         .approve(contractAddress, amount)
         .send({ from: address });
-      const tx = await contract.methods
-        .releaseAnimal(index)
-        .send({
-          from: address,
-        });
+      const tx = await contract.methods.releaseAnimal(index).send({
+        from: address,
+      });
       getBalance();
-      getAnimals()
+      getAnimals();
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
     initializeWallet();
@@ -178,27 +174,57 @@ function App() {
         </header>
         <main>
           <div className="row row-cols-1 row-cols-md-3 mb-3 text-center">
-            {animals.map(animal => <div className="col">
-              <div className="card mb-4 rounded-3 shadow-sm">
-                <div className="card-header py-3">
-                  <h4 className="my-0 fw-normal">{animal.name}</h4>
-                </div>
-                <div className="card-body">
-                  <h1 className="card-title pricing-card-title">${animal.amount}<small className="text-muted fw-light">cUSD</small></h1>
-                  <img width={200} src="https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1936&q=80" alt="" />
-                  <p className="list-unstyled mt-3 mb-4">
-                    {animal.description}
-                  </p>
-                  {!animal.sold ? <button type="button" onClick={() => adoptAnimal(animal.index)} className="w-100 btn btn-lg btn-outline-primary">Adopt Animal</button>
-                    : animal.owner === address ?
-                      <button type="button" onClick={() => releaseAnimal(animal.index)} className="w-100 btn btn-lg btn-outline-danger">Release Animal</button>
-                      : "Not the owner"}
+            {animals.map((animal) => (
+              <div className="col" key={animal.index}>
+                <div className="card mb-4 rounded-3 shadow-sm">
+                  <div className="card-header py-3">
+                    <h4 className="my-0 fw-normal">{animal.name}</h4>
+                  </div>
+                  <div className="card-body">
+                    <h1 className="card-title pricing-card-title">
+                      ${animal.amount}
+                      <small className="text-muted fw-light">cUSD</small>
+                    </h1>
+                    <img
+                      width={200}
+                      src={
+                        animal.image.length > 15
+                          ? animal.image
+                          : "https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1936&q=80"
+                      }
+                      alt=""
+                    />
+                    <p className="list-unstyled mt-3 mb-4">
+                      {animal.description}
+                    </p>
+                    {!animal.sold && animal.owner !== address ? (
+                      <button
+                        type="button"
+                        onClick={() => adoptAnimal(animal.index)}
+                        className="w-100 btn btn-lg btn-outline-primary"
+                      >
+                        Adopt Animal
+                      </button>
+                    ) : (
+                      ""
+                    )}
+                    {animal.sold && animal.owner === address ? (
+                      <button
+                        type="button"
+                        onClick={() => releaseAnimal(animal.index)}
+                        className="w-100 btn btn-lg btn-outline-danger"
+                      >
+                        Release Animal
+                      </button>
+                    ) : (
+                      ""
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>)}
+            ))}
           </div>
         </main>
-
 
         <div className="p-3 w-50 justify-content-center">
           <h2>Add your Animal to be Adopted</h2>
