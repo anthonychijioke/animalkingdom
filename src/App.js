@@ -185,7 +185,7 @@ function App() {
                 </div>
                 <div className="card-body">
                   <h1 className="card-title pricing-card-title">${animal.amount}<small className="text-muted fw-light">cUSD</small></h1>
-                  <img width={200} src="https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1936&q=80" alt="" />
+                  <img width={200} src={animal.image} alt=""/>
                   <p className="list-unstyled mt-3 mb-4">
                     {animal.description}
                   </p>
